@@ -45,6 +45,10 @@ bash Miniconda3-latest-Linux-x86_64.sh
 ```
 Follow the prompts and accept the license agreement. After installation, restart your terminal.
 
+If `conda --version` returns an error, manually add Miniconda to PATH:
+- **Windows:** Add `C:\Users\YourUsername\miniconda3\Scripts` to System Environment Variables PATH
+- **Linux/macOS:** Run `echo 'export PATH="$HOME/miniconda3/bin:$PATH"' >> ~/.bashrc && source ~/.bashrc`
+
 ### Step 2: Download DNA Extractor Repository
 
 **Option A: Using Git (if Git is installed)**
@@ -314,6 +318,10 @@ wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
 bash Miniconda3-latest-Linux-x86_64.sh
 ```
 Talimatları izleyin ve lisans sözleşmesini kabul edin. Kurulumdan sonra terminalinizi yeniden başlatın.
+
+Eğer `conda --version` hata veriyorsa, Miniconda'yı manuel olarak PATH'e ekleyin:
+- **Windows:** `C:\Users\YourUsername\miniconda3\Scripts` adresini Sistem Ortam Değişkenleri PATH'ine ekleyin
+- **Linux/macOS:** `echo 'export PATH="$HOME/miniconda3/bin:$PATH"' >> ~/.bashrc && source ~/.bashrc` komutunu çalıştırın
 
 ### Adım 2: DNA Extractor Deposunu İndirme
 
