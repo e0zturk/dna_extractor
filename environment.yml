@@ -1,0 +1,13 @@
+name: dna_extractor
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - python=3.12
+  - pip
+  - pip:
+    - pyfaidx>=0.7.2
+    - biopython>=1.81
+    - mygene>=3.2.2
+    - requests>=2.31.0
