@@ -33,8 +33,8 @@ def OS_terminal_download():
 
 ModeUsages = " Mode options:\n\n" \
              "  canonical: Only the canonical transcript sequence is included in the output.\n\n" \
-             "  no-repeats: Repetitive elements (e.g., Alu, LINE-1) are removed from the extended TSS sequence.\n\n" \
-             "  no-exons: Exon sequences from all transcripts are removed from the extended TSS sequence.\n\n" \
+             "  no-repeats: Repetitive elements (e.g., Alu, LINE-1) are masked from the extended TSS sequence.\n\n" \
+             "  no-exons: Exon sequences from all transcripts are masked from the extended TSS sequence.\n\n" \
              "  all: The full extended TSS sequence is included without any filtering (default)\n\n"
 
 arg = argparse.ArgumentParser(description="Get extended TSS sequences from a FASTA file",formatter_class=argparse.RawDescriptionHelpFormatter, epilog=ModeUsages)
@@ -150,10 +150,10 @@ if not args["output"]:
     args["output"] = f"{gene_location['id']}_extended-TSS.fasta"
 
 """
-remove_exon used to remove exon sequences from the extended TSS sequence.
-a gunzip file made as an output file includes overall transcript 'removed-exon' fasta sequence
+mask_exons used to mask exon sequences from the extended TSS sequence.
+a gunzip file made as an output file includes overall transcript 'masked-exon' fasta sequence
 """
-def remove_exons(js_data, prom_start, prom_end, full_seq, sstrand):
+def mask_exons(js_data, prom_start, prom_end, full_seq, sstrand):
     transcripts = {i: {"exons": js_data["Transcript"][i]["Exon"]} for i in range(len(js_data["Transcript"]))}
     
     Exons = {
@@ -178,7 +178,7 @@ def remove_exons(js_data, prom_start, prom_end, full_seq, sstrand):
             
             raw_targets[t_key][exon_out_key] = coords 
     
-    removed_seqs = {}
+    masked_seqs = {}
     for t_key, exons in raw_targets.items():
         seq_list = list(full_seq.upper())
         
@@ -194,20 +194,20 @@ def remove_exons(js_data, prom_start, prom_end, full_seq, sstrand):
             idx_end = min(len(seq_list), idx_end)
             
             if idx_start < idx_end:
-                seq_list[idx_start:idx_end] = [""] * (idx_end - idx_start)
-        removed_seqs[t_key] = "".join(seq_list)
+                seq_list[idx_start:idx_end] = ["N"] * (idx_end - idx_start)
+        masked_seqs[t_key] = "".join(seq_list)
 
-    return removed_seqs
+    return masked_seqs
 
 
-removed_exon_seqs = remove_exons(gene_location, prom_start, prom_end, fasta_seq, strand)
+masked_exon_seqs = mask_exons(gene_location, prom_start, prom_end, fasta_seq, strand)
 
 if not args["output"].endswith(".fasta"):
     args["output"] += ".fasta"
 
-def write_rmexon(removed_seqs_dict, js_dict, chrom, strand, prom_start, prom_end):
+def write_mskexon(masked_seqs_dict, js_dict, chrom, strand, prom_start, prom_end):
     sorted_keys = sorted(
-        removed_seqs_dict.keys(),
+        masked_seqs_dict.keys(),
         key=lambda x: int(x.replace("target", ""))
     )
     gene_id = js_dict.get("id")
@@ -218,7 +218,7 @@ def write_rmexon(removed_seqs_dict, js_dict, chrom, strand, prom_start, prom_end
         transcript_id = js_dict["Transcript"][transcript_index]["id"]
         chrom_local = js_dict.get("seq_region_name", chrom)
         strand_local = js_dict.get("strand", strand)
-        seq = removed_seqs_dict[t_key]
+        seq = masked_seqs_dict[t_key]
         
         if not seq or len(seq) == 0:
             continue
@@ -228,18 +228,18 @@ def write_rmexon(removed_seqs_dict, js_dict, chrom, strand, prom_start, prom_end
         if invalid_chars:
             print(f"WARNING : Transcript {transcript_id} contains invalid characters: {invalid_chars}")
         
-        out_path = f"removed-exons_{transcript_id}.fasta"
+        out_path = f"masked-exons_{transcript_id}.fasta"
         
         try:
             with open(out_path, "w", encoding="utf-8") as out:
-                out.write(f">{transcript_id}|{chrom_local}:{prom_start}-{prom_end}|strand:{strand_local}|removed_exons\n")
+                out.write(f">{transcript_id}|{chrom_local}:{prom_start}-{prom_end}|strand:{strand_local}|masked_exons\n")
                 for i in range(0, len(seq), 80):
                     out.write(seq[i:i+80] + "\n")
             written_files.append(out_path)
         except IOError as e:
             raise IOError(f"Error writing file {out_path}: {e}")
     
-    tar_gz_path = f"{gene_id}_removed-exons.tar.gz"
+    tar_gz_path = f"{gene_id}_masked-exons.tar.gz"
     
     with tarfile.open(tar_gz_path, "w:gz") as tar:
         for fasta_file in written_files:
@@ -248,7 +248,7 @@ def write_rmexon(removed_seqs_dict, js_dict, chrom, strand, prom_start, prom_end
     for fasta_file in written_files:
         os.remove(fasta_file)
     
-    print(f"INFO : Exon-removed extended TSS sequences saved to {tar_gz_path}")
+    print(f"INFO : Exon-masked extended TSS sequences saved to {tar_gz_path}")
 
 
 def write_norepeats(full_seq,chrom, strand, prom_start, prom_end):
@@ -298,8 +298,8 @@ def write_all(full_seq,chrom, strand, prom_start, prom_end):
 
 
 
-if args["mode"] == "no-exons":
-    write_rmexon(removed_exon_seqs, gene_location, chrom, strand, prom_start, prom_end)
+if args["mode"] == "mask-exons":
+    write_mskexon(masked_exon_seqs, gene_location, chrom, strand, prom_start, prom_end)
 elif args["mode"] == "no-repeats":
     write_norepeats(fasta_seq, chrom, strand, prom_start, prom_end)
 elif args["mode"] == "canonical":
@@ -307,7 +307,7 @@ elif args["mode"] == "canonical":
 elif args["mode"] == "all":
     write_all(fasta_seq, chrom, strand, prom_start, prom_end)
 else:
-    print("BatchError: Invalid mode selected. Please choose from <canonical>, <no-repeats>, <no-exons>, or <all>.")
+    print("BatchError: Invalid mode selected. Please choose from <canonical>, <no-repeats>, <mask-exons>, or <all>.")
 
 if not args["mode"]:
     write_all(fasta_seq, chrom, strand, prom_start, prom_end)
