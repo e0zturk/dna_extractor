@@ -298,7 +298,7 @@ def write_all(full_seq,chrom, strand, prom_start, prom_end):
 
 
 
-if args["mode"] == "mask-exons":
+if args["mode"] == "no-exons":
     write_mskexon(masked_exon_seqs, gene_location, chrom, strand, prom_start, prom_end)
 elif args["mode"] == "no-repeats":
     write_norepeats(fasta_seq, chrom, strand, prom_start, prom_end)
@@ -307,7 +307,7 @@ elif args["mode"] == "canonical":
 elif args["mode"] == "all":
     write_all(fasta_seq, chrom, strand, prom_start, prom_end)
 else:
-    print("BatchError: Invalid mode selected. Please choose from <canonical>, <no-repeats>, <mask-exons>, or <all>.")
+    print("BatchError: Invalid mode selected. Please choose from <canonical>, <no-repeats>, <no-exons>, or <all>.")
 
 if not args["mode"]:
     write_all(fasta_seq, chrom, strand, prom_start, prom_end)

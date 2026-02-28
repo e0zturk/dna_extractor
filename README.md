@@ -140,7 +140,7 @@ python3 extractor.py -i <input_fasta> -o <output_name> -up <upstream_bp> -down <
 
 **no-repeats**: Removes repetitive elements (e.g., Alu, LINE-1) from the sequence. These elements are typically represented in lowercase in the reference genome.
 
-**no-exons**: Removes exon sequences from all transcripts in the region. A separate FASTA file is generated for each transcript to ensure precise removal according to each transcript's coordinates. Output is provided as a tar.gz archive containing individual files for easy per-transcript examination.
+**no-exons**: Masks exon sequences from all transcripts in the region by replacing them with 'N' characters. A separate FASTA file is generated for each transcript to ensure precise masking according to each transcript's coordinates. Output is provided as a tar.gz archive containing individual files for easy per-transcript examination.
 
 ### Example Commands
 
@@ -180,7 +180,7 @@ python extractor.py -i sample.fasta -mod no-repeats
 python3 extractor.py -i sample.fasta -mod no-repeats
 ```
 
-Extract intronic sequences (remove exons):
+Extract intronic sequences (mask exons):
 ```bash
 # Windows
 python extractor.py -i sample.fasta -mod no-exons -mail your.email@example.com
@@ -197,8 +197,8 @@ The tool generates output files in FASTA format with descriptive headers contain
 
 - **all mode**: `<gene_id>_all.fasta` - Complete extended TSS sequence
 - **canonical mode**: `<gene_id>_canonical.fasta` - Canonical transcript only
-- **no-repeats mode**: `<gene_id>_norepeats.fasta` - Sequence with repetitive elements removed
-- **no-exons mode**: `<gene_id>_removed-exons.tar.gz` - Compressed archive containing individual FASTA files for each transcript with exons removed
+- **no-repeats mode**: `<gene_id>_norepeats.fasta` - Sequence with repetitive elements maskd
+- **no-exons mode**: `<gene_id>_masked-exons.tar.gz` - Compressed archive containing individual FASTA files for each transcript with exons masked as 'N' characters
 
 FASTA headers include the following information:
 ```
@@ -414,7 +414,7 @@ python3 extractor.py -i <girdi_fasta> -o <çıktı_adı> -up <upstream_bp> -down
 
 **no-repeats**: Sekansdan tekrarlayan elemanları (örneğin Alu, LINE-1) kaldırır. Bu elemanlar tipik olarak referans genomda küçük harflerle temsil edilir.
 
-**no-exons**: Bölgedeki tüm transkriptlerden ekzon sekanslarını kaldırır. Her transkript için ayrı FASTA dosyası oluşturulur ve ekzon koordinatlarına göre hassas şekilde kaldırılır. Çıktı, her transkript için ayrı dosyalar içeren tar.gz arşivi olarak sağlanır.
+**no-exons**: Bölgedeki tüm transkriptlerden ekzon sekanslarını 'N' karakterleriyle maskeleyerek hiden hale getirir. Her transkript için ayrı FASTA dosyası oluşturulur ve ekzon koordinatlarına göre hassas şekilde maskelenir. Çıktı, her transkript için ayrı dosyalar içeren tar.gz arşivi olarak sağlanır.
 
 ### Örnek Komutlar
 
@@ -472,7 +472,7 @@ Araç, çıkarılan sekans hakkında meta veriler içeren açıklayıcı başlı
 - **all modu**: `<gene_id>_all.fasta` - Tam genişletilmiş TSS sekansı
 - **canonical modu**: `<gene_id>_canonical.fasta` - Yalnızca kanonik transkript
 - **no-repeats modu**: `<gene_id>_norepeats.fasta` - Tekrarlayan elemanlar kaldırılmış sekans
-- **no-exons modu**: `<gene_id>_removed-exons.tar.gz` - Her bir transkript için ayrı FASTA dosyaları içeren sıkıştırılmış arşiv (ekzonlar kaldırılmış)
+- **no-exons modu**: `<gene_id>_masked-exons.tar.gz` - Her bir transkript için ayrı FASTA dosyaları içeren sıkıştırılmış arşiv (ekzonlar 'N' karakterleriyle maskelenmiş)
 
 FASTA başlıkları aşağıdaki bilgileri içerir:
 ```
