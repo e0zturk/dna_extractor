@@ -131,6 +131,7 @@ python3 extractor.py -i <input_fasta> -o <output_name> -up <upstream_bp> -down <
 - `-down, --downstream`: Base pairs downstream of TSS (default: 500)
 - `-mod, --mode`: Filtering mode - see modes section below (default: all)
 - `-mail, --email`: NCBI email address (optional but recommended to avoid rate limiting)
+- `-his, --history`: Select from previously cached JSON files in jsoncache directory (skip new BLAST search)
 
 ### Extraction Modes
 
@@ -141,6 +142,27 @@ python3 extractor.py -i <input_fasta> -o <output_name> -up <upstream_bp> -down <
 **no-repeats**: Removes repetitive elements (e.g., Alu, LINE-1) from the sequence. These elements are typically represented in lowercase in the reference genome.
 
 **no-exons**: Masks exon sequences from all transcripts in the region by replacing them with 'N' characters. A separate FASTA file is generated for each transcript to ensure precise masking according to each transcript's coordinates. Output is provided as a tar.gz archive containing individual files for easy per-transcript examination.
+
+### Advanced Usage: Using Cached JSON Files
+
+The tool automatically caches all generated JSON files in the `jsoncache/` directory for future reuse. This is useful when testing different extraction modes on the same gene without re-running BLAST searches.
+
+**Using the `-his` (history) flag:**
+
+```bash
+# Windows
+python extractor.py -his -mod all -up 1500 -down 800
+
+# Linux and macOS
+python3 extractor.py -his -mod all -up 1500 -down 800
+```
+
+When you use `-his`, the tool will:
+1. List all cached JSON files in the `jsoncache/` directory
+2. Prompt you to select one by number (1, 2, 3, ...)
+3. Extract sequences using your selected JSON without running BLAST again
+
+This significantly speeds up the workflow when analyzing multiple genes or testing different modes on the same gene.
 
 ### Example Commands
 
@@ -255,6 +277,13 @@ If the search exceeds 5 minutes or appears stuck:
    - This significantly improves query speed and reduces timeouts
 
 Once data is cached locally (JSON file stored in `raw_dir`), subsequent runs will be much faster and will not require the BLAST search step.
+
+**NCBI Server Errors: "Couldn't resolve #exLinkSrv2"**
+
+This error occurs when NCBI servers are temporarily unavailable. The tool now automatically retries up to 3 times with a 5-second delay between attempts. If the error persists:
+1. Wait a few minutes and try again
+2. Check NCBI status: https://www.ncbi.nlm.nih.gov/home/about/status/
+3. Use the `-mail` parameter with your registered NCBI email for priority access
 
 ---
 
@@ -405,6 +434,7 @@ python3 extractor.py -i <girdi_fasta> -o <çıktı_adı> -up <upstream_bp> -down
 - `-down, --downstream`: TSS'in downstream tarafındaki baz çifti sayısı (varsayılan: 500)
 - `-mod, --mode`: Filtreleme modu - modlar bölümüne bakınız (varsayılan: all)
 - `-mail, --email`: NCBI e-posta adresi (isteğe bağlı ancak hız sınırlandırmasını önlemek için önerilir)
+- `-his, --history`: jsoncache klasöründeki daha önce indirilmiş JSON dosyalarından seç (yeni BLAST araması yapmaz)
 
 ### Çıkarım Modları
 
@@ -415,6 +445,27 @@ python3 extractor.py -i <girdi_fasta> -o <çıktı_adı> -up <upstream_bp> -down
 **no-repeats**: Sekansdan tekrarlayan elemanları (örneğin Alu, LINE-1) kaldırır. Bu elemanlar tipik olarak referans genomda küçük harflerle temsil edilir.
 
 **no-exons**: Bölgedeki tüm transkriptlerden ekzon sekanslarını 'N' karakterleriyle maskeleyerek hiden hale getirir. Her transkript için ayrı FASTA dosyası oluşturulur ve ekzon koordinatlarına göre hassas şekilde maskelenir. Çıktı, her transkript için ayrı dosyalar içeren tar.gz arşivi olarak sağlanır.
+
+### İleri Kullanım: Önbelleğe Alınan JSON Dosyalarını Kullanma
+
+Araç, tüm oluşturulan JSON dosyalarını `jsoncache/` klasöründe otomatik olarak önbelleğe alır. Bu, aynı gen üzerinde farklı çıkarım modlarını test ederken BLAST aramasını yeniden çalıştırmanıza gerek kalmadan kullanışlıdır.
+
+**`-his` (history) parametresi kullanma:**
+
+```bash
+# Windows
+python extractor.py -his -mod all -up 1500 -down 800
+
+# Linux ve macOS
+python3 extractor.py -his -mod all -up 1500 -down 800
+```
+
+`-his` parametresini kullandığınızda araç:
+1. `jsoncache/` klasöründeki tüm önbelleğe alınan JSON dosyalarını listeler
+2. Birini seçmenizi ister (1, 2, 3, ...)
+3. BLAST'ı yeniden çalıştırmadan seçilen JSON'u kullanarak sekansları çıkarır
+
+Bu, birden fazla gen analiz ederken veya aynı gen üzerinde farklı modları test ederken iş akışını önemli ölçüde hızlandırır.
 
 ### Örnek Komutlar
 
@@ -527,6 +578,13 @@ Arama 5 dakikayı aşarsa veya takılı kalırsa:
    - Ziyaret edin: https://www.ncbi.nlm.nih.gov/account/
    - Hesap oluşturun ve kayıtlı e-postanızı `-mail` parametresi ile kullanın
    - Bu, sorgu hızını önemli ölçüde iyileştirir ve zaman aşımlarını azaltır
+
+**NCBI Sunucu Hatası: "Couldn't resolve #exLinkSrv2"**
+
+Bu hata, NCBI sunucularının geçici olarak kullanılamadığı durumda oluşur. Araç artık deneme arasında 5 saniye bekleme ile 3 kez otomatik olarak yeniden dener. Hata devam ederse:
+1. Birkaç dakika bekleyip yeniden deneyin
+2. NCBI durumunu kontrol edin: https://www.ncbi.nlm.nih.gov/home/about/status/
+3. Öncelikli erişim için kayıtlı NCBI e-postanız ile `-mail` parametresini kullanın
 
 ## Alıntı
 
