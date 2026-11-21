@@ -2,6 +2,7 @@
 ### gereken düzeltmeler
 * miniconda yüklendikten sonra miniconda içine git yüklenmesi (miniconda bash)
 * yourusername denen saçmalık yerine .../e0zturk/dna_extractor....
+* bi de yaml environment içine biopython ve mygene kütüphaneleri eklenecek
 ## Overview
 
 DNA Extractor is a bioinformatics tool designed to extract extended transcription start site (TSS) sequences from the human genome. While originally developed for researchers working with G4-quadruplex structural analysis, this tool provides flexible sequence extraction capabilities with multiple filtering modes that make it useful for various genomic research applications.
